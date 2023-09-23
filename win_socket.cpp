@@ -1,7 +1,7 @@
-#include <cstdlib>
+#include "win_socket.h"
+
 #include <iostream>
 
-#include "win_socket.h"
 
 
 Socket::Socket() : m_sock(0)
@@ -63,7 +63,7 @@ bool Socket::listen() const
 {
     if ( ! is_valid() )
         return false;
-    int listen_return = ::listen ( m_sock, MAXCONNECTIONS );
+    int listen_return = ::listen ( m_sock, Settings::MAXCONNECTIONS );
     if ( listen_return == -1 )
         return false;
     return true;
@@ -80,7 +80,7 @@ bool Socket::accept ( Socket& new_socket ) const
 }
 
 // connect to server
-bool Socket::connect( const string host, const int port ) 
+bool Socket::connect( const std::string host, const int port ) 
 {
     if ( ! is_valid() )
         return false;
@@ -98,7 +98,7 @@ bool Socket::connect( const string host, const int port )
         // translate hostname to ip addr
         host_info = gethostbyname( host.c_str() );
         if (NULL == host_info) {
-            cout << "Unknown server" << endl;
+            std::cout << "Unknown server" << std::endl;
             exit(1);
     }
     memcpy( (char *)&m_addr.sin_addr, host_info->h_addr,
@@ -115,7 +115,7 @@ bool Socket::connect( const string host, const int port )
 }
 
 // TCP
-bool Socket::send( const string s ) const
+bool Socket::send( const std::string s ) const
 {
     int status = ::send ( m_sock, s.c_str(), s.size(), 0 );
     if ( status == -1 )
@@ -124,33 +124,33 @@ bool Socket::send( const string s ) const
 }
 
 // TCP
-int Socket::recv ( string& s ) const
+int Socket::recv ( std::string& s ) const
 {
-    char buf [ MAXRECV + 1 ];
+    char buf [ Settings::MAXRECV + 1 ];
     s = "";
-    memset ( buf, 0, MAXRECV + 1 );
-    int status = ::recv ( m_sock, buf, MAXRECV, 0 );
+    memset ( buf, 0, Settings::MAXRECV + 1 );
+    int status = ::recv ( m_sock, buf, Settings::MAXRECV, 0 );
 
     if ( status > 0 || status != SOCKET_ERROR ) {
         s = buf;
         return status;
     }
     else {
-        cout << "Fehler in Socket::recv" << endl;
+        std::cout << "Fehler in Socket::recv" << std::endl;
         exit(1);
         return 0;
     }
 }
 
 // UDP
-bool Socket::UDP_send( const string addr, const string s, const int port ) const
+bool Socket::UDP_send( const std::string addr, const std::string s, const int port ) const
 {
     struct sockaddr_in addr_sento;
     struct hostent *h;
     int rc;
     h = gethostbyname(addr.c_str());
     if (h == NULL) {
-        cout << "Unkown host?" << endl;
+        std::cout << "Unkown host?" << std::endl;
         exit(1);
     }
 
@@ -161,25 +161,25 @@ bool Socket::UDP_send( const string addr, const string s, const int port ) const
 
     rc = sendto( m_sock, s.c_str(), s.size(), 0, (struct sockaddr *) &addr_sento, sizeof (addr_sento));
     if (rc == SOCKET_ERROR) {
-        cout << "Data couldn't be sent - sendto()" << endl;
+        std::cout << "Data couldn't be sent - sendto()" << std::endl;
         exit(1);
     }
     return true;
 }
 
 // UDP
-int Socket::UDP_recv( string& s ) const
+int Socket::UDP_recv( std::string& s ) const
 {
     struct sockaddr_in addr_recvfrom;
     int len, n;
-    char buf [ MAXRECV + 1 ];
+    char buf [ Settings::MAXRECV + 1 ];
     s = "";
-    memset ( buf, 0, MAXRECV + 1 );
+    memset ( buf, 0, Settings::MAXRECV + 1 );
     len = sizeof (addr_recvfrom);
 
-    n = recvfrom ( m_sock, buf, MAXRECV, 0, (struct sockaddr *) &addr_recvfrom, &len );
+    n = recvfrom ( m_sock, buf, Settings::MAXRECV, 0, (struct sockaddr *) &addr_recvfrom, &len );
     if (n == SOCKET_ERROR){
-        cout << "Fehler bei recvfrom()" << endl;
+        std::cout << "Fehler bei recvfrom()" << std::endl;
         exit(1);
         return 0;
     }
@@ -200,4 +200,3 @@ bool Socket::close() const {
     cleanup();
     return true;
 }
-»
