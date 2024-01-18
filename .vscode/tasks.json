@@ -2,24 +2,17 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "cppbuild",
-			"label": "C/C++: cpp build active file",
-			"command": "/usr/bin/cpp",
+			"type": "shell",
+			"label": "compile",
+			"command": "g++",
 			"args": [
-				"-fdiagnostics-color=always",
 				"-g",
-				"${file}",
+				"client.cpp",
+				"win_socket.h",
+				"win_socket.cpp",
 				"-o",
-				"${fileDirname}/${fileBasenameNoExtension}"
-			],
-			"options": {
-				"cwd": "${fileDirname}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": "build",
-			"detail": "compiler: /usr/bin/cpp"
-		}
+				"a.out"
+			]
+	}
 	]
 }
